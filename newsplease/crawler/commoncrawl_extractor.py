@@ -48,6 +48,8 @@ class CommonCrawlExtractor:
     __ignore_unicode_errors = False
     # fetch images
     __fetch_images = False
+    # comma separated list of languages to crawl
+    __filter_language = None
     # log level
     __log_level = logging.INFO
     __delete_warc_after_extraction = True
@@ -139,6 +141,13 @@ class CommonCrawlExtractor:
                     return False, article
                 if self.__filter_end_date and publishing_date > self.__filter_end_date:
                     return False, article
+            
+        # filter by language
+        if self.__filter_language is not None and len(self.__filter_language) > 0:
+            if not article:
+                article = self._from_warc(warc_record)
+            if article.language not in self.__filter_language:
+                return False, article
 
         return True, article
 
@@ -307,7 +316,7 @@ class CommonCrawlExtractor:
                                  strict_date=True, reuse_previously_downloaded_files=True, local_download_dir_warc=None,
                                  continue_after_error=True, ignore_unicode_errors=False,
                                  show_download_progress=False, log_level=logging.ERROR, delete_warc_after_extraction=True,
-                                 log_pathname_fully_extracted_warcs=None, fetch_images=False):
+                                 log_pathname_fully_extracted_warcs=None, fetch_images=False, filter_language=None):
         """
         Crawl and extract articles form the news crawl provided by commoncrawl.org. For each article that was extracted
         successfully the callback function callback_on_article_extracted is invoked where the first parameter is the
@@ -345,6 +354,9 @@ class CommonCrawlExtractor:
         self.__log_level = log_level
         self.__delete_warc_after_extraction = delete_warc_after_extraction
         self.__log_pathname_fully_extracted_warcs = log_pathname_fully_extracted_warcs
+        self.__filter_language = None
+        if filter_language is not None:
+            self.__filter_language = set(filter_language.split(','))
 
         self.__s3_client = None
         try:

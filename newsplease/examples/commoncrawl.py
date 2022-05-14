@@ -82,6 +82,8 @@ my_continue_process = True
 my_fetch_images = False
 # if True, just list the WARC files to be processed, but do not actually download and process them
 my_dry_run=False
+# Only extract document in the given language
+my_filter_language = None
 ############ END YOUR CONFIG #########
 
 
@@ -182,7 +184,8 @@ def main():
                                                delete_warc_after_extraction=my_delete_warc_after_extraction,
                                                continue_process=True,
                                                fetch_images=my_fetch_images,
-                                               dry_run=my_dry_run)
+                                               dry_run=my_dry_run,
+                                               filter_language=my_filter_language)
 
 
 if __name__ == "__main__":
